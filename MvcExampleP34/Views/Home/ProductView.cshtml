@@ -1,0 +1,20 @@
+﻿@model MvcExampleP34.Models.Product
+
+@{
+    // параметр модели - объект Product
+    // параметризоване представлення
+
+    var product = Model;
+}
+
+<a class="btn btn-primary"
+    asp-controller="Home" asp-action="ProductViews" asp-route-id="@Model.Id">Details</a>
+
+<div>
+    <h2>Product</h2>
+    <p><strong>Id:</strong> @Model.Id</p>
+    <p><strong>Name:</strong> @Model.Name</p>
+    <p><strong>Description:</strong> @Model.Description</p>
+    <p><strong>Price:</strong> $@Model.Price</p>
+    <p><strong>Quantity:</strong> @Model.Quantity</p>
+</div>

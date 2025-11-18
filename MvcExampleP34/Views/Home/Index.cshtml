@@ -1,0 +1,21 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+
+    //var product = ViewData["Product"] as Product;
+    var product = ViewBag.Product as Product;
+    var bestProduct = ViewBag.BestProduct as Product;
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+    <div>
+        <h2>Product</h2>
+        <p><strong>Id:</strong> @product.Id</p>
+        <p><strong>Name:</strong> @product.Name</p>
+        <p><strong>Description:</strong> @product.Description</p>
+        <p><strong>Price:</strong> $@product.Price</p>
+        <p><strong>Quantity:</strong> @product.Quantity</p>
+    </div>
+</div>
