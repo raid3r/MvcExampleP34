@@ -16,12 +16,21 @@ public class ProductController(StoreContext context) : Controller
         return View(products);
     }
 
+    /// <summary>
+    /// Створення продукту (форма)
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     public async Task<IActionResult> Create()
     {
         return View(new Product());
     }
 
+    /// <summary>
+    /// Створення продукту (обробка форми)
+    /// </summary>
+    /// <param name="product"></param>
+    /// <returns></returns>
     [HttpPost]
     public async Task<IActionResult> Create([FromForm] Product product)
     {
@@ -34,6 +43,11 @@ public class ProductController(StoreContext context) : Controller
         return View(product);
     }
 
+    /// <summary>
+    /// Редагування продукту (форма)
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpGet]
     public async Task<IActionResult> Edit(int id)
     {
@@ -45,6 +59,12 @@ public class ProductController(StoreContext context) : Controller
         return View(product);
     }
 
+    /// <summary>
+    /// Редагування продукту (обробка форми)
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="product"></param>
+    /// <returns></returns>
     [HttpPost]
     public async Task<IActionResult> Edit(int id, [FromForm] Product product)
     {
@@ -62,6 +82,11 @@ public class ProductController(StoreContext context) : Controller
         return RedirectToAction("Index");
     }
 
+    /// <summary>
+    /// Видалення продукту
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpPost]
     public async Task<IActionResult> Delete(int id)
     {
