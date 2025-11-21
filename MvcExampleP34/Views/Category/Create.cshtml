@@ -1,0 +1,16 @@
+﻿@model Category
+@{
+    ViewData["Title"] = "Create Category";
+
+}
+
+<form method="post" class="mt-4">
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-controller="Category" asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+

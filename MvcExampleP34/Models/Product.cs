@@ -7,4 +7,5 @@ public class Product
     public decimal Price { get; set; }
     public int Quantity { get; set; }
     public string Description { get; set; }
+    public virtual Category? Category { get; set; } = null;
 }
