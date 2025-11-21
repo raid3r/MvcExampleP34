@@ -16,6 +16,7 @@ public class ProductController(StoreContext context) : Controller
         var products = await context
             .Products
             .Include(x => x.Category)
+            .Include(x => x.Tags)
             .ToListAsync();
         return View(products);
     }
@@ -27,10 +28,27 @@ public class ProductController(StoreContext context) : Controller
     [HttpGet]
     public async Task<IActionResult> Create()
     {
+        await PopulateViewData();
+
+        var tags = await context.Tags.ToListAsync();
+        return View(new ProductForm()
+        {
+            Tags = new ProductTagsForm
+            {
+                Items = [.. tags.Select(tag => new ProductTagsFormItem
+                {
+                    Id = tag.Id,
+                    Name = tag.Name,
+                    IsSelected = false
+                })]
+            }
+        });
+    }
+
+    private async Task PopulateViewData()
+    {
         var catefories = await context.Categories.ToListAsync();
         ViewData["Categories"] = catefories;
-
-        return View(new ProductForm());
     }
 
     /// <summary>
@@ -43,8 +61,7 @@ public class ProductController(StoreContext context) : Controller
     {
         if (!ModelState.IsValid)
         {
-            var catefories = await context.Categories.ToListAsync();
-            ViewData["Categories"] = catefories;
+            await PopulateViewData();
 
             return View(form);
         }
@@ -59,6 +76,20 @@ public class ProductController(StoreContext context) : Controller
             Category = category
         };
 
+        // Список вибраних тегів (їх Id)
+        var selectedTagIds = form.Tags.Items
+            .Where(x => x.IsSelected)
+            .Select(x => x.Id)
+            .ToList();
+
+        // Дістати з бази відповідні теги
+        var selectedTags = await context.Tags.Where(x => selectedTagIds.Contains(x.Id)).ToListAsync();
+        // Додати теги до продукту
+        foreach (var tag in selectedTags)
+        {
+            model.Tags.Add(tag);
+        }
+
         context.Add(model);
         await context.SaveChangesAsync();
         return RedirectToAction("Index");
@@ -72,21 +103,35 @@ public class ProductController(StoreContext context) : Controller
     [HttpGet]
     public async Task<IActionResult> Edit(int id)
     {
-        var catefories = await context.Categories.ToListAsync();
-        ViewData["Categories"] = catefories;
+        await PopulateViewData();
 
-        var product = await context.Products.Include(x => x.Category).FirstAsync(x => x.Id == id);
+        var product = await context.Products
+            .Include(x => x.Category)
+            .Include(x => x.Tags)
+            .FirstAsync(x => x.Id == id);
         if (product == null)
         {
             return NotFound();
         }
+
+        var tags = await context.Tags.ToListAsync();
+
         return View(new ProductForm
         {
             Name = product.Name,
             Price = product.Price,
             Quantity = product.Quantity,
             Description = product.Description,
-            CategoryId = product.Category?.Id ?? 0
+            CategoryId = product.Category?.Id ?? 0,
+            Tags = new ProductTagsForm
+            {
+                Items = [.. tags.Select(tag => new ProductTagsFormItem
+                {
+                    Id = tag.Id,
+                    Name = tag.Name,
+                    IsSelected = product.Tags.Any(t => t.Id == tag.Id)
+                })]
+            }
         });
     }
 
@@ -101,13 +146,15 @@ public class ProductController(StoreContext context) : Controller
     {
         if (!ModelState.IsValid)
         {
-            var catefories = await context.Categories.ToListAsync();
-            ViewData["Categories"] = catefories;
+            await PopulateViewData();
+
             return View(form);
         }
 
-        var model = await context.Products.FirstAsync(x => x.Id == id);
-        var category = await context.Categories.FindAsync(form.CategoryId); 
+        var model = await context.Products
+            .Include(x => x.Tags)
+            .FirstAsync(x => x.Id == id);
+        var category = await context.Categories.FindAsync(form.CategoryId);
 
         model.Name = form.Name;
         model.Price = form.Price;
@@ -115,6 +162,24 @@ public class ProductController(StoreContext context) : Controller
         model.Description = form.Description;
         model.Category = category;
 
+        // Оновлення тегів
+        var selectedTagIds = form.Tags.Items
+            .Where(x => x.IsSelected)
+            .Select(x => x.Id)
+            .ToList();
+        // Очистка поточних тегів
+        model.Tags.Clear();
+        // Додавання вибраних тегів
+        var selectedTags = await context.Tags
+            .Where(x => selectedTagIds.Contains(x.Id))
+            .ToListAsync();
+        // Додавання вибраних тегів до продукту
+        foreach (var tag in selectedTags)
+        {
+            model.Tags.Add(tag);
+        }
+
+        // Збереження змін
         await context.SaveChangesAsync();
         return RedirectToAction("Index");
     }

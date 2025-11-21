@@ -17,4 +17,6 @@ public class ProductForm
     [DisplayName("Категорія")]
     [Required]
     public int CategoryId { get; set; }
+
+    public ProductTagsForm Tags { get; set; } = new ProductTagsForm();
 }

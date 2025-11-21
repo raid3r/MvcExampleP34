@@ -23,6 +23,11 @@
                 <td>
                     <b>@product.Name</b><br />
                     @product.Description
+                    <br />
+                    @foreach (var tag in product.Tags)
+                    {
+                        <span class="badge bg-secondary">@tag.Name</span>
+                    }
                 </td>
                 <td>
                     @product.Category?.Name
@@ -34,9 +39,9 @@
                     <a asp-controller="Product" asp-action="Edit" asp-route-id="@product.Id"
                        class="btn btn-warning">Edit</a>
 
-                    <a class="btn btn-danger method-delete" 
-                    asp-controller="Product" asp-action="Delete" 
-                    asp-route-id="@product.Id">Delete</a>
+                    <a class="btn btn-danger method-delete"
+                       asp-controller="Product" asp-action="Delete"
+                       asp-route-id="@product.Id">Delete</a>
                 </td>
             </tr>
         }

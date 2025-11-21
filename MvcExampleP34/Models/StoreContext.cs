@@ -13,6 +13,7 @@ public class StoreContext : DbContext
     // Визначення DbSet для сутностей
     public DbSet<Product> Products { get; set; }
     public DbSet<Category> Categories { get; set; }
+    public DbSet<Tag> Tags { get; set; }
 
 
     // Метод для налаштування моделі та конфігурації бази даних
