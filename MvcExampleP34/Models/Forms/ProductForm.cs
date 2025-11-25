@@ -19,4 +19,6 @@ public class ProductForm
     public int CategoryId { get; set; }
 
     public ProductTagsForm Tags { get; set; } = new ProductTagsForm();
+
+    public ICollection<IFormFile>? Images { get; set; } = new List<IFormFile>();
 }

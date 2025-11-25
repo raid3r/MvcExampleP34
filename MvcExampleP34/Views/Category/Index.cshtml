@@ -10,7 +10,8 @@
 <table class="table table-hover">
     <thead>
         <tr>
-            <th>Catetegory</th>
+            <th></th>
+            <th>Category</th>
             <th></th>
         </tr>
     </thead>
@@ -18,6 +19,14 @@
         @foreach (var category in Model)
         {
             <tr>
+                <td>
+                    @if (category.Image is not null)
+                    {
+                        <img src="@category.Image.Src" alt="@category.Name" width="50"
+                        style="max-height: 50px"
+                        />
+                    }
+                </td>
                 <td>
                     <b>@category.Name</b>
                 </td>

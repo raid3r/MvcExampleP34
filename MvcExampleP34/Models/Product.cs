@@ -9,4 +9,7 @@ public class Product
     public string Description { get; set; }
     public virtual Category? Category { get; set; } = null;
     public virtual ICollection<Tag> Tags { get; set; } = new List<Tag>();
+
+    public virtual ICollection<ImageUploaded> Images { get; set; } = new List<ImageUploaded>();
+
 }

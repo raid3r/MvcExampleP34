@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MvcExampleP34.Models;
 
@@ -11,9 +12,11 @@ using MvcExampleP34.Models;
 namespace MvcExampleP34.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20251125164421_CategoryImageUploaded")]
+    partial class CategoryImageUploaded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace MvcExampleP34.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("ImageUploadedProduct", b =>
-                {
-                    b.Property<int>("ImagesId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ImagesId", "ProductsId");
-
-                    b.HasIndex("ProductsId");
-
-                    b.ToTable("ImageUploadedProduct");
-                });
 
             modelBuilder.Entity("MvcExampleP34.Models.Category", b =>
                 {
@@ -139,21 +127,6 @@ namespace MvcExampleP34.Migrations
                     b.HasIndex("TagsId");
 
                     b.ToTable("ProductTag");
-                });
-
-            modelBuilder.Entity("ImageUploadedProduct", b =>
-                {
-                    b.HasOne("MvcExampleP34.Models.ImageUploaded", null)
-                        .WithMany()
-                        .HasForeignKey("ImagesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MvcExampleP34.Models.Product", null)
-                        .WithMany()
-                        .HasForeignKey("ProductsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("MvcExampleP34.Models.Category", b =>

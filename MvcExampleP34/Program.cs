@@ -1,11 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MvcExampleP34.Models;
+using MvcExampleP34.Models.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<IFileStorage, FileStorage>();
 
 builder.Services.AddDbContext<StoreContext>(options =>
 {
@@ -77,4 +79,16 @@ app.Run();
  * 
  * Додати вибір тегів при створенні/редагуванні продукту
  * черех чекбокси
- */ 
+ */
+
+
+/*
+ * 1. Додати можливість завантаження зображень для категорій
+ * 
+ * 2. Додати можливість завантаження кількох зображень для продуктів
+ *
+ *
+ * 3. Додати можливість видалення завантажених зображень (для продукту та категорій)
+ *    Для продукту - по одному зображенню
+ *
+ */

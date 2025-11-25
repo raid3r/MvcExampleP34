@@ -1,34 +1,52 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MvcExampleP34.Models;
+using MvcExampleP34.Models.Forms;
+using MvcExampleP34.Models.Services;
 
 namespace MvcExampleP34.Controllers;
 
-public class CategoryController(StoreContext context) : Controller
+public class CategoryController(StoreContext context, IFileStorage fileStorage) : Controller
 {
     public async Task<IActionResult> Index()
     {
-        var models = await context.Categories.ToListAsync();
+        var models = await context.Categories
+            .Include(x => x.Image)
+            .ToListAsync();
         return View(models);
     }
 
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        return View(new Category());
+        return View(new CategoryForm());
     }
 
-    
+
     [HttpPost]
-    public async Task<IActionResult> Create([FromForm] Category form)
+    public async Task<IActionResult> Create([FromForm] CategoryForm form)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            context.Add(form);
-            await context.SaveChangesAsync();
-            return RedirectToAction("Index");
+            return View(form);
         }
-        return View(form);
+
+        var model = new Category
+        {
+            Name = form.Name
+        };
+        if (form.Image != null)
+        {
+            var image = new ImageUploaded
+            {
+                FileName = await fileStorage.SaveFileAsync(form.Image),
+            };
+            model.Image = image;
+        }
+
+        context.Add(model);
+        await context.SaveChangesAsync();
+        return RedirectToAction("Index");
     }
 
     [HttpGet]
@@ -39,19 +57,37 @@ public class CategoryController(StoreContext context) : Controller
         {
             return NotFound();
         }
-        return View(model);
+        return View(new CategoryForm
+        {
+            Name = model.Name
+        });
     }
 
     [HttpPost]
-    public async Task<IActionResult> Edit(int id, [FromForm] Category form)
+    public async Task<IActionResult> Edit(int id, [FromForm] CategoryForm form)
     {
         if (!ModelState.IsValid)
         {
             return View(form);
         }
 
-        var model = await context.Categories.FirstAsync(x => x.Id == id);
+        var model = await context.Categories.Include(x => x.Image).FirstAsync(x => x.Id == id);
         model.Name = form.Name;
+
+        if (form.Image != null)
+        {
+            if (model.Image != null)
+            {
+                await fileStorage.DeleteFileAsync(model.Image.FileName);
+            }
+
+            var image = new ImageUploaded
+            {
+                FileName = await fileStorage.SaveFileAsync(form.Image),
+            };
+            model.Image = image;
+        }
+
         await context.SaveChangesAsync();
         return RedirectToAction("Index");
     }
@@ -59,11 +95,18 @@ public class CategoryController(StoreContext context) : Controller
     [HttpDelete]
     public async Task<IActionResult> Delete(int id)
     {
-        var model = await context.Categories.FindAsync(id);
+        var model = await context.Categories.Include(x => x.Image).FirstAsync(x => x.Id == id);
         if (model == null)
         {
             return NotFound();
         }
+        
+        if (model.Image != null)
+        {
+            await fileStorage.DeleteFileAsync(model.Image.FileName);
+            context.Remove(model.Image);
+        }
+
         context.Remove(model);
         await context.SaveChangesAsync();
         return new JsonResult(new { ok = true });

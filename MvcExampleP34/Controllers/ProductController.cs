@@ -2,10 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using MvcExampleP34.Models;
 using MvcExampleP34.Models.Forms;
+using MvcExampleP34.Models.Services;
 
 namespace MvcExampleP34.Controllers;
 
-public class ProductController(StoreContext context) : Controller
+public class ProductController(StoreContext context, IFileStorage fileStorage) : Controller
 {
     /// <summary>
     /// Список продуктів
@@ -17,6 +18,7 @@ public class ProductController(StoreContext context) : Controller
             .Products
             .Include(x => x.Category)
             .Include(x => x.Tags)
+            .Include(x => x.Images)
             .ToListAsync();
         return View(products);
     }
@@ -66,6 +68,8 @@ public class ProductController(StoreContext context) : Controller
             return View(form);
         }
 
+        
+
         var category = await context.Categories.FindAsync(form.CategoryId);
         var model = new Product
         {
@@ -75,6 +79,17 @@ public class ProductController(StoreContext context) : Controller
             Description = form.Description,
             Category = category
         };
+
+        if (form.Images != null) {
+            foreach (var imageFile in form.Images)
+            {
+                var image = new ImageUploaded
+                {
+                    FileName = await fileStorage.SaveFileAsync(imageFile),
+                };
+                model.Images.Add(image);
+            }
+        }
 
         // Список вибраних тегів (їх Id)
         var selectedTagIds = form.Tags.Items
@@ -153,6 +168,7 @@ public class ProductController(StoreContext context) : Controller
 
         var model = await context.Products
             .Include(x => x.Tags)
+            .Include(x => x.Images)
             .FirstAsync(x => x.Id == id);
         var category = await context.Categories.FindAsync(form.CategoryId);
 
@@ -161,6 +177,28 @@ public class ProductController(StoreContext context) : Controller
         model.Quantity = form.Quantity;
         model.Description = form.Description;
         model.Category = category;
+
+        // delete old images if new uploaded
+        if (form.Images != null && form.Images.Count > 0)
+        {
+            // видалення старих збережених файлів
+            foreach (var image in model.Images)
+            {
+                await fileStorage.DeleteFileAsync(image.FileName);
+            }
+            // видалення записів з бази
+            model.Images.Clear();
+            // додавання нових збережених файлів
+            foreach (var imageFile in form.Images)
+            {
+                var image = new ImageUploaded
+                {
+                    FileName = await fileStorage.SaveFileAsync(imageFile),
+                };
+                model.Images.Add(image);
+            }
+        }
+
 
         // Оновлення тегів
         var selectedTagIds = form.Tags.Items
@@ -192,12 +230,18 @@ public class ProductController(StoreContext context) : Controller
     [HttpDelete]
     public async Task<IActionResult> Delete(int id)
     {
-        var product = await context.Products.FirstAsync(x => x.Id == id);
+        var product = await context.Products.Include(x => x.Images).FirstAsync(x => x.Id == id);
         if (product == null)
         {
             return NotFound();
         }
-        context.Products.Remove(product);
+        //delete images from storage
+        foreach (var image in product.Images)
+        {
+            await fileStorage.DeleteFileAsync(image.FileName);
+            context.Remove(image);
+        }
+        context.Remove(product);
         await context.SaveChangesAsync();
         return new JsonResult(new { ok = true });
     }
