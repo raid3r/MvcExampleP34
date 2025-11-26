@@ -1,55 +1,73 @@
 ﻿@model ProductForm
 @{
     ViewData["Title"] = "Edit Product";
-
-    var availableCategories = ViewData["Categories"] as List<Category>;
-    var categoryOptions = new SelectList(availableCategories, "Id", "Name");
+    var productId = ViewData["ProductId"] as int?; 
 }
 
-<form enctype="multipart/form-data" method="post" class="mt-4">
-    <div class="mb-3">
-        <label asp-for="Name" class="form-label"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+<div class="row">
+    <div class="col-md-6">
+        @await Html.PartialAsync("_ProductForm", Model)
     </div>
-    <div class="mb-3">
-        <label asp-for="Description" class="form-label"></label>
-        <textarea asp-for="Description" class="form-control"></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="Price" class="form-label"></label>
-        <input asp-for="Price" class="form-control" />
-        <span asp-validation-for="Price" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="Quantity" class="form-label"></label>
-        <input asp-for="Quantity" class="form-control" />
-        <span asp-validation-for="Quantity" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="CategoryId" class="form-label"></label>
-        <select asp-for="CategoryId" class="form-select" asp-items="categoryOptions">
-            <option value="">-- Select Category --</option>
-        </select>
-        <span asp-validation-for="CategoryId" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="Images" class="form-label"></label>
-        <input asp-for="Images" multiple accept=".jpg,.jpeg,.png" class="form-control" />
-        <span asp-validation-for="Images" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        @for (int i = 0; i < Model.Tags.Items.Count; i++)
-        {
-            <div class="form-check">
-                <input type="hidden" asp-for="Tags.Items[i].Id" />
-                <input type="checkbox" class="form-check-input" asp-for="Tags.Items[i].IsSelected" />
-                <label asp-for="Tags.Items[i].IsSelected" class="form-check-label">@Model.Tags.Items[i].Name</label>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3>Images</h3>
             </div>
-        }
+            <div class="card-body" id="images-content"></div>
+        </div>
     </div>
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-controller="Product" asp-action="Index" class="btn btn-secondary">Cancel</a>
-</form>
+</div>
+
+@section Scripts {
+    <script>
+        function loadImages() {
+        fetch('@Url.Action("Images", "Product", new { id = productId })')
+            .then(r => r.text())
+            .then(html => {
+                document.getElementById('images-content').innerHTML = html;
+                document.querySelectorAll("button.confirm-image-delete").forEach(button => {
+                    button.addEventListener("click", function () {
+                        const imageId = this.getAttribute("data-id");
+                        Swal.fire({
+                            title: "Are you sure?",
+                            text: "You won't be able to revert this!",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#3085d6",
+                            cancelButtonColor: "#d33",
+                            confirmButtonText: "Yes, delete it!"
+                        })
+                        .then((result) => {
+                            if (result.isConfirmed) {
+                                fetch(`@Url.Action("DeleteImage", "Product")/${imageId}`, {
+                                    method: "DELETE"
+                                })
+                                .then(r => r.json())
+                                .then(data => {
+                                            Swal.fire(
+                                                "Deleted!",
+                                                "Your image has been deleted.",
+                                                "success"
+                                            );
+                                            loadImages();
+                                    })
+                                .catch(() => {
+                                            Swal.fire(
+                                                "Error!",
+                                                "There was an error deleting the image.",
+                                                "error"
+                                            )
+                                    })
+
+                            }
+                        })
+                    })
+                })
+            });
+        }
+
+        loadImages()
+    </script>
+}
+
 

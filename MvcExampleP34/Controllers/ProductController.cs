@@ -118,6 +118,7 @@ public class ProductController(StoreContext context, IFileStorage fileStorage) :
     [HttpGet]
     public async Task<IActionResult> Edit(int id)
     {
+        ViewData["ProductId"] = id;
         await PopulateViewData();
 
         var product = await context.Products
@@ -128,6 +129,8 @@ public class ProductController(StoreContext context, IFileStorage fileStorage) :
         {
             return NotFound();
         }
+
+        
 
         var tags = await context.Tags.ToListAsync();
 
@@ -161,6 +164,7 @@ public class ProductController(StoreContext context, IFileStorage fileStorage) :
     {
         if (!ModelState.IsValid)
         {
+            ViewData["ProductId"] = id;
             await PopulateViewData();
 
             return View(form);
@@ -244,5 +248,31 @@ public class ProductController(StoreContext context, IFileStorage fileStorage) :
         context.Remove(product);
         await context.SaveChangesAsync();
         return new JsonResult(new { ok = true });
+    }
+
+    public async Task<IActionResult> Images(int id)
+    {
+        var product = await context.Products
+            .Include(x => x.Category)
+            .Include(x => x.Tags)
+            .Include(x => x.Images)
+            .FirstAsync(x => x.Id == id);
+
+        if (product == null)
+        {
+            return NotFound();
+        }
+
+        return PartialView("_EditImages", product.Images);
+    }
+
+    [HttpDelete]
+    public async Task<IActionResult> DeleteImage(int id)
+    {
+        var image = await context.Images.FirstAsync(x => x.Id == id);
+        await fileStorage.DeleteFileAsync(image.FileName);
+        context.Remove(image);
+        await context.SaveChangesAsync();
+        return new JsonResult(new { success = true });
     }
 }

@@ -52,6 +52,7 @@ public class CategoryController(StoreContext context, IFileStorage fileStorage) 
     [HttpGet]
     public async Task<IActionResult> Edit(int id)
     {
+        ViewData["CategoryId"] = id;
         var model = await context.Categories.FindAsync(id);
         if (model == null)
         {
@@ -68,6 +69,7 @@ public class CategoryController(StoreContext context, IFileStorage fileStorage) 
     {
         if (!ModelState.IsValid)
         {
+            ViewData["CategoryId"] = id;
             return View(form);
         }
 
@@ -111,4 +113,43 @@ public class CategoryController(StoreContext context, IFileStorage fileStorage) 
         await context.SaveChangesAsync();
         return new JsonResult(new { ok = true });
     }
+
+    public async Task<IActionResult> Images(int id)
+    {
+        var category = await context.Categories
+            .Include(x => x.Image)
+            .FirstAsync(x => x.Id == id);
+
+        if (category == null)
+        {
+            return NotFound();
+        }
+
+        var images = new List<ImageUploaded>();
+        if (category.Image != null)
+        {
+            images.Add(category.Image);
+        }
+
+        return PartialView("_EditImages", images);
+    }
+
+    [HttpDelete]
+    public async Task<IActionResult> DeleteImage(int id)
+    {
+        var image = await context.Images.FirstAsync(x => x.Id == id);
+
+        var category = await context.Categories
+            .Include(x => x.Image)
+            .FirstAsync(x => x.Image != null && x.Image.Id == id);
+
+        category.Image = null;
+
+        await fileStorage.DeleteFileAsync(image.FileName);
+        context.Remove(image);
+
+        await context.SaveChangesAsync();
+        return new JsonResult(new { success = true });
+    }
+
 }

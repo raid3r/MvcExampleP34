@@ -1,0 +1,22 @@
+﻿@model ICollection<ImageUploaded>
+@{
+
+}
+
+
+<div class="row">
+    @foreach (var image in Model)
+    {
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <img src="@image.Src" class="card-img-top" alt="Product Image" />
+                <div class="card-body text-center">
+                    <button 
+                        data-id="@image.Id"
+                        class="btn btn-danger confirm-image-delete btn-sm">Delete</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+

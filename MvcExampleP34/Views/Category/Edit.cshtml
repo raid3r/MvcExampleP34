@@ -1,22 +1,72 @@
 ﻿@model CategoryForm
 @{
     ViewData["Title"] = "Edit Category";
+    var categoryId = ViewData["CategoryId"] as int?;
 }
 
-<form enctype="multipart/form-data" method="post" class="mt-4">
-    <div class="mb-3">
-        <label asp-for="Name" class="form-label"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+<div class="row">
+    <div class="col-md-6">
+        @await Html.PartialAsync("_CategoryForm", Model)
     </div>
-    <div class="mb-3">
-        <label asp-for="Image" class="form-label"></label>
-        <input asp-for="Image" accept=".jpg,.jpeg,.png" class="form-control" />
-        <span asp-validation-for="Image" class="text-danger"></span>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3>Images</h3>
+            </div>
+            <div class="card-body" id="images-content"></div>
+        </div>
     </div>
-    <div class="mb-3 d-flex justify-content-between">
-        <button type="submit" class="btn btn-primary">Create</button>
-        <a asp-controller="Category" asp-action="Index" class="btn btn-secondary">Cancel</a>
-    </div>
-</form>
+</div>
+
+@section Scripts {
+    <script>
+        function loadImages() {
+        fetch('@Url.Action("Images", "Category", new { id = categoryId })')
+            .then(r => r.text())
+            .then(html => {
+                document.getElementById('images-content').innerHTML = html;
+                document.querySelectorAll("button.confirm-image-delete").forEach(button => {
+                    button.addEventListener("click", function () {
+                        const imageId = this.getAttribute("data-id");
+                        Swal.fire({
+                            title: "Are you sure?",
+                            text: "You won't be able to revert this!",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#3085d6",
+                            cancelButtonColor: "#d33",
+                            confirmButtonText: "Yes, delete it!"
+                        })
+                        .then((result) => {
+                            if (result.isConfirmed) {
+                                fetch(`@Url.Action("DeleteImage", "Category")/${imageId}`, {
+                                    method: "DELETE"
+                                })
+                                .then(r => r.json())
+                                .then(data => {
+                                            Swal.fire(
+                                                "Deleted!",
+                                                "Your image has been deleted.",
+                                                "success"
+                                            );
+                                            loadImages();
+                                    })
+                                .catch(() => {
+                                            Swal.fire(
+                                                "Error!",
+                                                "There was an error deleting the image.",
+                                                "error"
+                                            )
+                                    })
+
+                            }
+                        })
+                    })
+                })
+            });
+        }
+
+        loadImages()
+    </script>
+}
 
