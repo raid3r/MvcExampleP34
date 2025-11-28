@@ -1,0 +1,19 @@
+﻿@model HomePageSearchForm
+@{
+    var options = ViewData["CategoryOptions"] as SelectList;
+}
+
+
+<form method="get" asp-controller="Home" asp-action="Index" class="d-flex mb-4 mt-4">
+    <input asp-for="Query"
+           class="form-control me-2"
+           placeholder="Search products..." />
+    
+
+    <select asp-for="CategoryId" class="form-select me-2" style="width: 200px;"
+            asp-items="options">
+        <option value="">-- All Categories --</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+

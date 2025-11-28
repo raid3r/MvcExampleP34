@@ -1,21 +1,47 @@
-﻿@{
+﻿@model HomeIndexPageModel
+@{
     ViewData["Title"] = "Home Page";
-
-    //var product = ViewData["Product"] as Product;
-    var product = ViewBag.Product as Product;
-    var bestProduct = ViewBag.BestProduct as Product;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-
-    <div>
-        <h2>Product</h2>
-        <p><strong>Id:</strong> @product.Id</p>
-        <p><strong>Name:</strong> @product.Name</p>
-        <p><strong>Description:</strong> @product.Description</p>
-        <p><strong>Price:</strong> $@product.Price</p>
-        <p><strong>Quantity:</strong> @product.Quantity</p>
+<div class="row">
+    <div class="col-md-12 category-items">
+        @foreach (var category in Model.Categories)
+        {
+            <a class="category-item" asp-controller="Home" asp-action="Category" asp-route-id="@category.Id">
+                <div class="category-item__image-wrap">
+                    @if (category.Image is not null)
+                    {
+                        <img src="@category.Image.Src" />
+                    }
+                </div>
+                <h5 class="category-item__title">@category.Name</h5>
+            </a>
+        }
     </div>
-</div>
+
+    <div class="row">
+        <div class="col-12">
+            @await Html.PartialAsync("_SearchForm", Model.SearchForm,
+            new ViewDataDictionary(ViewData) {
+                        { "CategoryOptions", Model.SelectListCategories }
+                        })
+        </div>
+    </div>
+
+    <div class="row">
+        @foreach (var product in Model.Products)
+        {
+            <div class="col-md-3 mb-4">
+                <div class="card product-item">
+                    @if (product.Images.Any())
+                    {
+                        <img src="@product.Images.First().Src" class="card-img-top product-item__image" />
+                    }
+                    <div class="card-body">
+                        <h5 class="card-title">@product.Name</h5>
+                        <p class="card-text">$@product.Price</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>

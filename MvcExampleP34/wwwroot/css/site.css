@@ -1,22 +1,61 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
 }
+
+
+
+
+.category-items {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.category-item {
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: anchor-center;
+    border: 1px solid grey;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+    .category-item:hover {
+        background-color: yellow;
+    }
+
+.category-item__image-wrap {
+    padding: 5px;
+}
+
+    .category-item__image-wrap img {
+        max-height: 30px;
+    }
+
+.category-item__title {
+    font-size: 16px;
+    margin: 0;
+    color: black;
+}
+
+

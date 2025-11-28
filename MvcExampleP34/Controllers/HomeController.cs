@@ -1,71 +1,75 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MvcExampleP34.Models;
+using MvcExampleP34.Models.Forms;
+using MvcExampleP34.Models.PageModels;
 
 namespace MvcExampleP34.Controllers;
 
-public class HomeController(ILogger<HomeController> logger) : Controller
+public class HomeController(StoreContext context) : Controller
 {
-    // GET: /Home/Index
-    // POST: /Home/Index
-    // DELETE: /Home/Index
-    public IActionResult Index()
+    /// <summary>
+    /// Головна сторінка сайту
+    /// </summary>
+    /// <returns></returns>
+    public async Task<IActionResult> Index([FromQuery] HomePageSearchForm form)
     {
-        var product = new Product
+        var model = new HomeIndexPageModel
         {
-            Id = 1,
-            Name = "Sample Product",
-            Description = "This is a sample product description.",
-            Price = 9.99M,
-            Quantity = 100
+            SearchForm = form,
+            Categories = await context.Categories
+            .Include(x => x.Image)
+            .ToListAsync(),
+            Products = await context.Products
+            .Include(x => x.Tags)
+            .Include(x => x.Images)
+            .Where(x => x.Category.Id == (form.CategoryId ?? x.Category.Id))
+            .Where(x => string.IsNullOrEmpty(form.Query)
+                || x.Name.Contains(form.Query)
+                || x.Description.Contains(form.Query))
+            .ToListAsync()
         };
-        ViewData["Product"] = product;
-        ViewData["Product1"] = product;
-        ViewBag.BestProduct = product;
 
+        return View(model);
+    }
+
+    /// <summary>
+    /// Сторінка категорії
+    /// </summary>
+    /// <returns></returns>
+    public async Task<IActionResult> Category()
+    {
+        // 
+        return View();
+    }
+
+    /// <summary>
+    /// Сторінка продукту
+    /// </summary>
+    /// <returns></returns>
+    public async Task<IActionResult> Product()
+    {
+        // 
         return View();
     }
 
 
-    // GET: /Home/Privacy
-    // POST: /Home/Privacy
-    // DELETE: /Home/Privacy
     public IActionResult Privacy()
     {
         return View();
     }
 
-    // GET: /Home/ProductView
-    // POST: /Home/ProductView
-    // DELETE: /Home/ProductView
-    public IActionResult ProductView(int id)
-    {
-        var product = new Product
-        {
-            Id = 1,
-            Name = "Sample Product",
-            Description = "This is a sample product description.",
-            Price = 9.99M,
-            Quantity = 100
-        };
-
-        return View(product);
-    }
 
     /*
+ * Головна сторінка сайту
+ * - список категорій з картинками
+ * - форма пошуку продуктів (по назві та опису)
+ * - список продуктів
  * 
- * 1.Створіть дію контроллера Список продуктів
- * Виведіть продукти у вигляді таблиці на сторінці
+ * Сторінка категорії
  * 
- * Продукти створити та заповнити у дії контроллера
- * 
- * 2. Створіть дію контроллера Деталі продукту з параметром id
- * Додайте в таблицю посилання на сторінку Деталі продукту (кнопку)
- * На сторінці Деталі продукту виведіть інформацію про вибраний продукт
- * та кнопку Повернутися до списку продуктів
- * 
- * 
- * 
+ * Сторінка продукту
  * 
  */
 
