@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MvcExampleP34.Models;
 
 namespace MvcExampleP34.Controllers;
 
+[Authorize]
 public class TagController(StoreContext context) : Controller
 {
     public async Task<IActionResult> Index()

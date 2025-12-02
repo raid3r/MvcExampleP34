@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Identity;
 using MvcExampleP34.Models;
 using MvcExampleP34.Models.Services;
 
@@ -14,6 +15,29 @@ builder.Services.AddDbContext<StoreContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
+{
+    options.SignIn.RequireConfirmedPhoneNumber = false;
+    options.SignIn.RequireConfirmedEmail = false;
+    options.SignIn.RequireConfirmedAccount = false;
+
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireDigit = false;
+    options.Password.RequiredLength = 3;
+})
+    .AddRoles<IdentityRole<int>>()
+    .AddEntityFrameworkStores<StoreContext>()
+    .AddDefaultTokenProviders();
+
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = new PathString("/Account/Login");
+    options.LogoutPath = "/Account/Logout";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+});
 
 var app = builder.Build();
 
@@ -30,6 +54,17 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// 
+// запит - автентифікація користувача   user id 1
+//   - перевірка авторизації - ресурс - відповідь
+//  гість  -  неавтентифікований користувач
+//  автентифікований користувач
+//  ролі - адміністратор, менеджер, користувач
+//
+
+
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 //  Razor Pages

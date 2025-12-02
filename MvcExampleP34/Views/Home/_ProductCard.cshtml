@@ -1,0 +1,13 @@
+﻿@model Product
+@{
+}
+<div class="card product-item">
+    @if (Model.Images.Any())
+    {
+        <img src="@Model.Images.First().Src" class="card-img-top product-item__image" />
+    }
+    <div class="card-body">
+        <h5 class="card-title">@Model.Name</h5>
+        <p class="card-text">$@Model.Price</p>
+    </div>
+</div>

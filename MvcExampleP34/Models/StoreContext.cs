@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace MvcExampleP34.Models;
 
-public class StoreContext : DbContext
+public class StoreContext : IdentityDbContext<User, IdentityRole<int>, int>
 {
     // Конструктор за замовченням
     public StoreContext() : base() { }

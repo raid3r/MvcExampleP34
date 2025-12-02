@@ -1,0 +1,12 @@
+﻿@model Category
+@{
+}
+<a class="category-item" asp-controller="Home" asp-action="Category" asp-route-id="@Model.Id">
+    <div class="category-item__image-wrap">
+        @if (Model.Image is not null)
+        {
+            <img src="@Model.Image.Src" />
+        }
+    </div>
+    <h5 class="category-item__title">@Model.Name</h5>
+</a>

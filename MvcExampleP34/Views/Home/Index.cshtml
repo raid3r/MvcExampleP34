@@ -7,15 +7,7 @@
     <div class="col-md-12 category-items">
         @foreach (var category in Model.Categories)
         {
-            <a class="category-item" asp-controller="Home" asp-action="Category" asp-route-id="@category.Id">
-                <div class="category-item__image-wrap">
-                    @if (category.Image is not null)
-                    {
-                        <img src="@category.Image.Src" />
-                    }
-                </div>
-                <h5 class="category-item__title">@category.Name</h5>
-            </a>
+            @await Html.PartialAsync("_CategoryLinkItem", category)
         }
     </div>
 
@@ -32,16 +24,7 @@
         @foreach (var product in Model.Products)
         {
             <div class="col-md-3 mb-4">
-                <div class="card product-item">
-                    @if (product.Images.Any())
-                    {
-                        <img src="@product.Images.First().Src" class="card-img-top product-item__image" />
-                    }
-                    <div class="card-body">
-                        <h5 class="card-title">@product.Name</h5>
-                        <p class="card-text">$@product.Price</p>
-                    </div>
-                </div>
+                @await Html.PartialAsync("_ProductCard", product)
             </div>
         }
     </div>

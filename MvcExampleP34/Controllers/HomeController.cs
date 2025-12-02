@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MvcExampleP34.Models;
@@ -15,6 +16,16 @@ public class HomeController(StoreContext context) : Controller
     /// <returns></returns>
     public async Task<IActionResult> Index([FromQuery] HomePageSearchForm form)
     {
+        //if (User.Identity.IsAuthenticated)
+        //{
+        //    var userId = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+        //    var email = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email);
+        //}
+        
+
+        // jwt
+
+
         var model = new HomeIndexPageModel
         {
             SearchForm = form,
@@ -38,8 +49,9 @@ public class HomeController(StoreContext context) : Controller
     /// Сторінка категорії
     /// </summary>
     /// <returns></returns>
-    public async Task<IActionResult> Category()
+    public async Task<IActionResult> Category(int id)
     {
+
         // 
         return View();
     }
@@ -48,10 +60,16 @@ public class HomeController(StoreContext context) : Controller
     /// Сторінка продукту
     /// </summary>
     /// <returns></returns>
-    public async Task<IActionResult> Product()
+    public async Task<IActionResult> Product(int id)
     {
-        // 
-        return View();
+
+        var model = await context.Products
+            .Include(x => x.Images)
+            .Include(x => x.Tags)
+            .Include(x => x.Category)
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+        return View(model);
     }
 
 

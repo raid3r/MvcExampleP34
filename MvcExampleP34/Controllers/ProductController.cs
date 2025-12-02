@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MvcExampleP34.Models;
 using MvcExampleP34.Models.Forms;
@@ -6,6 +7,7 @@ using MvcExampleP34.Models.Services;
 
 namespace MvcExampleP34.Controllers;
 
+[Authorize]
 public class ProductController(StoreContext context, IFileStorage fileStorage) : Controller
 {
     /// <summary>
