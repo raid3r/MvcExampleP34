@@ -30,6 +30,12 @@ body {
     gap: 10px;
 }
 
+@media screen and (max-width: 800px) {
+    .category-items {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 .category-item {
     text-decoration: none;
     display: flex;

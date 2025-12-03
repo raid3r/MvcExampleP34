@@ -40,35 +40,34 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Tag" asp-action="Index">Tags</a>
                         </li>
                     }
-                    @if (User.IsInRole("ADMIN"))
-                    {
-                        
-                    }
-
-                    @if (User.IsInRole("MANAGER"))
-                    {
-
-                    }
-
-                    
-
                 </ul>
+
                 <ul class="navbar-nav flex-grow-1 justify-content-end">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                @userEmail
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li>
+                                    <a class="dropdown-item" asp-area="" asp-controller="Profile" asp-action="Index">Profile</a>
+                                </li>
+                                <li class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+
                     @if (!User.Identity.IsAuthenticated)
                     {
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
                         </li>
                     }
-                    else
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">@userEmail - Logout</a>
-
-                        </li>
-
-                    }
-                    </ul>
+                </ul>
             </div>
         </div>
     </nav>
