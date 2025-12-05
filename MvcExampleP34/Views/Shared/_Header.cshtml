@@ -28,7 +28,7 @@
                     <li class="nav-item">
                         <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="ProductView">Product View</a>
                     </li>
-                    @if (User.Identity.IsAuthenticated)
+                    @if (User.Identity.IsAuthenticated && User.IsInRole(RoleConstants.Manager))
                     {
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Index">Products</a>
@@ -53,9 +53,12 @@
                                 <li>
                                     <a class="dropdown-item" asp-area="" asp-controller="Profile" asp-action="Index">Profile</a>
                                 </li>
-                                <li>
-                                    <a class="dropdown-item" asp-area="" asp-controller="User" asp-action="Index">Users</a>
-                                </li>
+                                @if (User.IsInRole(RoleConstants.Admin))
+                                {
+                                    <li>
+                                        <a class="dropdown-item" asp-area="" asp-controller="User" asp-action="Index">Users</a>
+                                    </li>
+                                }
                                 <li class="dropdown-divider"></li>
                                 <li>
                                     <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
