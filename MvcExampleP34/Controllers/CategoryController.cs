@@ -7,7 +7,7 @@ using MvcExampleP34.Models.Services;
 
 namespace MvcExampleP34.Controllers;
 
-[Authorize]
+[Authorize(Roles = RoleConstants.Manager)]
 public class CategoryController(StoreContext context, IFileStorage fileStorage) : Controller
 {
     

@@ -1,0 +1,24 @@
+﻿.error-wrapper {
+    height: 70vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.error-page {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+}
+
+.error-code {
+    font-size: 8rem;
+    font-weight: 900;
+    line-height: 1;
+    opacity: 0.2;
+}
+
+@media (max-width: 576px) {
+    .error-code {
+        font-size: 5rem;
+    }
+}

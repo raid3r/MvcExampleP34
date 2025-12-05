@@ -80,6 +80,27 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}"
     );
 
+// Створення ролей при запуску додатку, якщо їх немає
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
+    var roles = new[] { 
+        RoleConstants.Admin,
+        RoleConstants.Manager
+    };
+    foreach (var role in roles)
+    {
+        var roleExists = await roleManager.RoleExistsAsync(role);
+        if (!roleExists)
+        {
+            await roleManager.CreateAsync(new IdentityRole<int>(role));
+        }
+    }
+}
+
+
+
+
 app.Run();
 
 
@@ -170,3 +191,21 @@ app.Run();
  * 
  * 
  */
+
+/*
+ * Додати список користувачів +
+ * Додати можливість змінювати пароль інших користувачів +
+ * Додати модливість видалення користувачів +
+ * 
+ * 
+ */
+
+/*
+ * Створити ролі користувачів
+ * 
+ * Admin - редагування користувачів
+ * Manager - редагування контенту
+ * 
+ * Просто авторизований користувач - оформлючати замовлення, переглядати свій профіль
+ * 
+ */ 

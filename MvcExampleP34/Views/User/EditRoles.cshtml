@@ -1,0 +1,48 @@
+﻿@model UserRolesForm
+@{
+    
+}
+
+<div class="row">
+
+    <div class="col-md-6">
+        @await Html.PartialAsync("_UserProfileCard", ViewData["User"])
+    </div>
+
+    <div class="col-md-6">
+
+        <form method="post">
+            <div class="card">
+
+                <div class="card-header">
+                    <h3>Assign roles</h3>
+                </div>
+
+                <div class="card-body">
+                    <div class="mb-3">
+                        @for (int i = 0; i < Model.Items.Count; i++)
+                        {
+                            <div class="form-check">
+                                <input type="hidden" asp-for="Items[i].Name" />
+                                <input type="checkbox" class="form-check-input" asp-for="Items[i].IsEnabled" />
+                                <label asp-for="Items[i].IsEnabled" class="form-check-label">@Model.Items[i].Name</label>
+                            </div>
+                        }
+                    </div>
+
+                </div>
+
+                <div class="card-footer d-flex justify-content-between">
+
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <a asp-controller="User" asp-action="Index" class="btn btn-secondary">Cancel</a>
+
+                </div>
+
+            </div>
+        </form>
+
+
+    </div>
+
+</div>

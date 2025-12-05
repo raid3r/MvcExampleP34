@@ -5,7 +5,7 @@ using MvcExampleP34.Models;
 
 namespace MvcExampleP34.Controllers;
 
-[Authorize]
+[Authorize(Roles = RoleConstants.Manager)]
 public class TagController(StoreContext context) : Controller
 {
     public async Task<IActionResult> Index()

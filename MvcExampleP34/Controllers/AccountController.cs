@@ -80,6 +80,14 @@ public class AccountController(UserManager<User> userManager) : Controller
         var identity = new ClaimsIdentity(IdentityConstants.ApplicationScheme);
         identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
         identity.AddClaim(new Claim(ClaimTypes.Email, user.Email));
+
+        var userRoles = await userManager.GetRolesAsync(user);
+        foreach (var role in userRoles)
+        {
+            identity.AddClaim(new Claim(ClaimTypes.Role, role));
+        }
+
+
         var principal = new ClaimsPrincipal(identity);
         await HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, principal);
     }
@@ -116,5 +124,11 @@ public class AccountController(UserManager<User> userManager) : Controller
         await SignInUserAsync(user);
 
         return RedirectToAction("Index", "Home");
+    }
+
+
+    public async Task<IActionResult> AccessDenied()
+    {
+        return View();
     }
 }
