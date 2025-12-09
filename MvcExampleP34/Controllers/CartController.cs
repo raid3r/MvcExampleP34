@@ -71,13 +71,19 @@ public class CartController(StoreContext context) : Controller
         return cart;
     }
 
-
+    [HttpGet]
     public async Task<IActionResult> Index()
     {
-        return View(await GetCart());
+        var cart =  await GetCart();
+        if (cart.Items.Count == 0)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+        return View(cart);
     }
 
     // Index
+    [HttpGet]
     public async Task<IActionResult> Count()
     {
         var cart = await GetCart();
@@ -86,6 +92,7 @@ public class CartController(StoreContext context) : Controller
 
 
     // Add
+    [HttpPost]
     public async Task<IActionResult> Add([FromBody] AddProductDto addProduct)
     {
         var cart = await GetCart();
@@ -112,6 +119,56 @@ public class CartController(StoreContext context) : Controller
         }
         await context.SaveChangesAsync();
 
+        return new JsonResult(new { Success = true });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Increase([FromBody] AddProductDto addProduct)
+    {
+        var cart = await GetCart();
+
+        var existingItem = cart.Items.FirstOrDefault(x => x.Product.Id == addProduct.ProductId);
+        if (existingItem != null)
+        {
+            existingItem.Quantity += addProduct.Quantity;
+            context.CartItems.Update(existingItem);
+            await context.SaveChangesAsync();
+        }
+
+        return new JsonResult(new { Success = true });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Decrease([FromBody] AddProductDto addProduct)
+    {
+        var cart = await GetCart();
+        var existingItem = cart.Items.FirstOrDefault(x => x.Product.Id == addProduct.ProductId);
+        if (existingItem != null)
+        {
+            existingItem.Quantity -= addProduct.Quantity;
+            if (existingItem.Quantity <= 0)
+            {
+                context.CartItems.Remove(existingItem);
+            }
+            else
+            {
+                context.CartItems.Update(existingItem);
+            }
+            await context.SaveChangesAsync();
+        }
+        return new JsonResult(new { Success = true });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Remove([FromBody] AddProductDto addProduct)
+    {
+        var cart = await GetCart();
+        var existingItem = cart.Items.FirstOrDefault(x => x.Product.Id == addProduct.ProductId);
+        if (existingItem != null)
+        {
+            context.CartItems.Remove(existingItem);
+            await context.SaveChangesAsync();
+        }
         return new JsonResult(new { Success = true });
     }
 

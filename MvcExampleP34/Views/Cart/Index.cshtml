@@ -18,7 +18,7 @@
     <tbody>
         @foreach (var item in Model.Items)
         {
-            <tr>
+            <tr data-product-id="@item.Product.Id" class="cart-item">
                 <td>
                     @foreach (var image in item.Product.Images)
                     {
@@ -33,7 +33,13 @@
                     <b>@item.Product.Price$</b>
                 </td>
                 <td>
-                    <b>@item.Quantity</b>
+                    <div>
+                        <button style="min-width: 50px; min-height: 50px; font-size: 20px;" class="btn btn-outline-primary cart-item-button item-decrise">-</button>
+                        <b class="btn " style="min-width:50px; font-size: 25px;">@item.Quantity</b>
+                        <button style="min-width: 50px; min-height: 50px; font-size: 20px" class="btn btn-outline-primary cart-item-button item-incrise">+</button>
+                        <button style="min-width: 50px; min-height: 50px; font-size: 20px" class="btn btn-outline-danger cart-item-button item-remove">X</button>
+                    </div>
+                    
                 </td>
                 <td>
                     <b>@(item.Quantity * item.Product.Price)$</b>
@@ -48,3 +54,6 @@
     </tbody>
 </table>
 
+@section Scripts {
+    <script src="~/js/cart.js" asp-append-version="true"></script>
+}
