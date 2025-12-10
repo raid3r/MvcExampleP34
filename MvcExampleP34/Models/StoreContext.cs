@@ -19,6 +19,8 @@ public class StoreContext : IdentityDbContext<User, IdentityRole<int>, int>
     public DbSet<ImageUploaded> Images { get; set; }
     public DbSet<Cart> Carts { get; set; }
     public DbSet<CartItem> CartItems { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderItem> OrderItems { get; set; }
 
 
     // Метод для налаштування моделі та конфігурації бази даних

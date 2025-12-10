@@ -6,75 +6,16 @@ using MvcExampleP34.Models;
 using MvcExampleP34.Models.Dto;
 using MvcExampleP34.Models.Forms;
 using MvcExampleP34.Models.PageModels;
+using MvcExampleP34.Models.Services;
 
 namespace MvcExampleP34.Controllers;
 
-public class CartController(StoreContext context) : Controller
+public class CartController(StoreContext context, CartService cartService) : Controller
 {
-    private async Task<Cart> CreateNewCart()
-    {
-        var cartUid = Guid.NewGuid().ToString();
-        Response.Cookies.Append("cart_uuid", cartUid, new CookieOptions
-        {
-            Expires = DateTimeOffset.UtcNow.AddDays(30)
-        });
-        var userId = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
-        var user = !string.IsNullOrEmpty(userId)
-            ? context.Users.Find(int.Parse(userId))
-            : null;
-        var newCart = new Cart
-        {
-            UniqueId = Guid.Parse(cartUid),
-            UpdatedAt = DateTime.UtcNow,
-            User = user
-        };
-        context.Carts.Add(newCart);
-        await context.SaveChangesAsync();
-        return newCart;
-    }
-
-    private async Task<Cart> GetCart()
-    {
-        var cartUid = Request.Cookies["cart_uuid"];
-        Cart? cart = null;
-        if (string.IsNullOrEmpty(cartUid))
-        {
-            cart = await CreateNewCart();
-        }
-        else
-        {
-            cart = await context.Carts
-                .Include(x => x.Items)
-                .ThenInclude(x => x.Product)
-                .ThenInclude(x => x.Images)
-                .Include(x => x.User)
-                .FirstOrDefaultAsync(x => x.UniqueId.ToString() == cartUid);
-
-            if (cart == null)
-            {
-                cart = await CreateNewCart();
-            }
-        }
-
-        if (cart.User == null && User.Identity.IsAuthenticated)
-        {
-            var userId = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
-            if (!string.IsNullOrEmpty(userId))
-            {
-                var user = await context.Users.FindAsync(int.Parse(userId));
-                cart.User = user;
-                context.Carts.Update(cart);
-                await context.SaveChangesAsync();
-            }
-        }
-
-        return cart;
-    }
-
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        var cart =  await GetCart();
+        var cart =  await cartService.GetCartAsync();
         if (cart.Items.Count == 0)
         {
             return RedirectToAction("Index", "Home");
@@ -86,7 +27,7 @@ public class CartController(StoreContext context) : Controller
     [HttpGet]
     public async Task<IActionResult> Count()
     {
-        var cart = await GetCart();
+        var cart = await cartService.GetCartAsync();
         return new JsonResult(new { Count = cart.Items.Count });
     }
 
@@ -95,7 +36,8 @@ public class CartController(StoreContext context) : Controller
     [HttpPost]
     public async Task<IActionResult> Add([FromBody] AddProductDto addProduct)
     {
-        var cart = await GetCart();
+        var cart = await cartService.GetCartAsync();
+
         var product = await context.Products.FindAsync(addProduct.ProductId);
         if (product == null)
         {
@@ -125,7 +67,7 @@ public class CartController(StoreContext context) : Controller
     [HttpPost]
     public async Task<IActionResult> Increase([FromBody] AddProductDto addProduct)
     {
-        var cart = await GetCart();
+        var cart = await cartService.GetCartAsync();
 
         var existingItem = cart.Items.FirstOrDefault(x => x.Product.Id == addProduct.ProductId);
         if (existingItem != null)
@@ -141,7 +83,8 @@ public class CartController(StoreContext context) : Controller
     [HttpPost]
     public async Task<IActionResult> Decrease([FromBody] AddProductDto addProduct)
     {
-        var cart = await GetCart();
+        var cart = await cartService.GetCartAsync();
+
         var existingItem = cart.Items.FirstOrDefault(x => x.Product.Id == addProduct.ProductId);
         if (existingItem != null)
         {
@@ -162,7 +105,8 @@ public class CartController(StoreContext context) : Controller
     [HttpPost]
     public async Task<IActionResult> Remove([FromBody] AddProductDto addProduct)
     {
-        var cart = await GetCart();
+        var cart = await cartService.GetCartAsync();
+
         var existingItem = cart.Items.FirstOrDefault(x => x.Product.Id == addProduct.ProductId);
         if (existingItem != null)
         {

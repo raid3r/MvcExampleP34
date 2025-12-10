@@ -10,6 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IFileStorage, FileStorage>();
 
+builder.Services.AddScoped<CartService>();
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddDbContext<StoreContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -208,14 +211,38 @@ app.Run();
  * 
  * Просто авторизований користувач - оформлючати замовлення, переглядати свій профіль
  * 
- */ 
+ */
 
 /*
+ * Реалізувати корзину покупок
+ * 
  * На сторінці корзини дореалізувати функції
  * додати кількість товару, зменшити кільікість товару, видалити товар з корзини
  * якщо кількість товару стає 0 або менше то товар видаляємо з корзини
  * якщо не залишилося товарів у корзині - перенаправляємо на головну сторінку сайту
  * 
+ */
+
+/*
+ * Створення замовленя
+ * * Може лише авторизований користувач
+ * /Order/Create
  * 
+ * Сторінка оформлення замовлення
+ * * Може лише авторизований користувач
+ * /Order/Create/{guid}
+ * 
+ * Сторінка оформленого замовлення
+ * /Order/CreateSuccess/{guid}
+ * 
+ * В заголовку в меню користувача додати посилання на сторінку замовлень користувача
+ * 
+ * Сторінка списку замовлень користувача    
+ * /Order/List
+ */
+
+/*
+ * -- Нова пошта (імітація ?)
+ * -- Сторінка оплати замовлення (імітація)
  * 
  */ 
