@@ -1,23 +1,20 @@
 ﻿@model Order
 @{
-    ViewData["Title"] = "Замовлення успішно оформлено";
+    ViewData["Title"] = $"Замовлення № {Model.Number}";
 }
 
 <div class="row">
     <div class="col-md-6">
-        <div class="col-md-6">
-            <h1>ViewData["Title"]</h1>
-            <h2>Замовлення № @Model.Number</h2>
-            @await Html.PartialAsync("_OrderStatusBadge", Model)
+        
+            <h1>@ViewData["Title"]</h1>
+            <div>@await Html.PartialAsync("_OrderStatusBadge", Model)</div>
             <div>
                 Оформлено: <span class="utc-date-time" data-utc="@Model.UpdatedAt.ToString("dd.MM.yyyy HH:mm")"></span>
             </div>
             @await Html.PartialAsync("_OrderItemsTable", Model)
-        </div>
+        
     </div>
     <div class="col-md-6">
-        <a asp-controller="Product" asp-action="Index" class="btn btn-primary btn-lg">Повернутися до покупок</a>
         <a asp-controller="Order" asp-action="List" class="btn btn-primary btn-lg">Мої замовлення</a>
     </div>
 </div>
-

@@ -1,0 +1,16 @@
+﻿@model Order
+@switch (Model.Status)
+{
+    case OrderStatusConstants.New:
+        <span class="badge bg-info">Нове</span>
+        break;
+    case OrderStatusConstants.Processing:
+        <span class="badge bg-info">Опрацьовується</span>
+        break;
+
+    case OrderStatusConstants.Completed:
+        <span class="badge bg-info">Виконано</span>
+        break;
+    default:
+        break;
+}

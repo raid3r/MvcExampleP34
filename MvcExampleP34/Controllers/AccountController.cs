@@ -123,10 +123,10 @@ public class AccountController(UserManager<User> userManager) : Controller
 
         await SignInUserAsync(user);
 
-        if (await userManager.IsInRoleAsync(user, RoleConstants.Admin))
-        {
-            return RedirectToAction("User", "Index");
-        }
+        //if (await userManager.IsInRoleAsync(user, RoleConstants.Admin))
+        //{
+        //    return RedirectToAction("User", "Index");
+        //}
 
         return RedirectToAction("Index", "Home");
     }
